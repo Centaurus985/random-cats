@@ -13,7 +13,7 @@ jobs:
     name: Terraform Destroy
     runs-on: ubuntu-latest
     env:
-      TF_VAR_s3_bucket_name: ${{vars.s3_bucket_name}}
+      TF_INPUT: false
 
 
     steps:
@@ -42,5 +42,5 @@ jobs:
       # Optional: Add condition to apply only on main branch pushes
       - name: Terraform Destroy
         if: github.ref == 'refs/heads/main'
-        run: terraform destroy -auto-approve - var=s3_bucket_name=random-cats-prod
+        run: terraform destroy -auto-approve
         working-directory: ./terraform

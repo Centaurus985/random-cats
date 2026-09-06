@@ -12,7 +12,7 @@ jobs:
     name: Terraform Plan & Apply
     runs-on: ubuntu-latest
     env:
-      TF_VAR_s3_bucket_name: ${{vars.s3_bucket_name}}
+      TF_INPUT: false
 
     steps:
       # Step 1: Clone the repository
