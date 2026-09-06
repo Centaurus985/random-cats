@@ -1,0 +1,44 @@
+name: Terraform Deployment
+
+on:
+  workflow_dispatch:
+
+
+permissions:
+  id-token: write # Required for requesting the JWT OIDC token from AWS
+  contents: read  # Required to checkout the repository code
+
+jobs:
+  terraform:
+    name: Terraform Destroy
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Clone the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Authenticate with AWS via OIDC
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: ://amazonaws.com
+          aws-region: ap-southeast-2
+          role-to-assume: arn:aws:iam::358140414416:role/GithubAction
+          role-session-name: GitHubActions-${{ github.job }}-${{ github.run_id }}
+
+      # Step 3: Setup Terraform CLI
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # Step 4: Run standard Terraform commands
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+
+      # Optional: Add condition to apply only on main branch pushes
+      - name: Terraform Destroy
+        if: github.ref == 'refs/heads/main'
+        run: terraform destroy -auto-approve
+        working-directory: ./terraform
