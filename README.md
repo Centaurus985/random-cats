@@ -11,7 +11,7 @@ It is a dockerised React/Typescript and Python application using FastAPI as the 
 5. Load balancer.
 6. IAM for permission policies and roles
 
-The listed infrastructure is provisioned using Terraform
+The listed infrastructure is provisioned using Terraform automatically in a Github Action workflow that is manually triggered. 
 
 There is a Github action set up that runs some tests on pull request to main. 
 
