@@ -8,7 +8,7 @@ It is a dockerised React/Typescript and Python application using FastAPI as the 
 2. ECR is used to host the Docker images.
 3. S3 is used to hold the cat pictures
 4. VPC is used for networking.
-5. Load balancer.
+5. Load balancer makes sure requests go to where they should.
 6. IAM for permission policies and roles
 
 The listed infrastructure is provisioned using Terraform automatically in a Github Action workflow that is manually triggered. 
