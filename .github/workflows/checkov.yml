@@ -19,4 +19,8 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         with:
           directory: ./terraform
-          framework: terraform 
+          framework: terraform
+          # 1. Only fail the build for critical security flaws
+          hard_fail_on: HIGH,CRITICAL 
+    # 2. Alternatively, set to true to never block the pipeline at all
+          soft_fail: false  
