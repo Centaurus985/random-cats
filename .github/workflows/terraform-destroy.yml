@@ -1,4 +1,4 @@
-name: Terraform Deployment
+name: Terraform Destroy
 
 on:
   workflow_dispatch:
@@ -12,6 +12,9 @@ jobs:
   terraform:
     name: Terraform Destroy
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_s3_bucket_name: ${{vars.s3_bucket_name}}
+
 
     steps:
       # Step 1: Clone the repository
