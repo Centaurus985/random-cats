@@ -1,6 +1,7 @@
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket containing the cat photos"
   type        = string
+  default     = "random-cats-prod"
 }
 
 variable "s3_prefix" {
