@@ -1,8 +1,7 @@
 name: Deploy Full-Stack to Amazon ECS
 
 on:
-  push:
-    branches: [ "main" ]
+    workflow_dispatch:
 
 env:
   AWS_REGION: ap-southeast-2                   # Set your AWS region
