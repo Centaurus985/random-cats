@@ -1,0 +1,49 @@
+{
+    "family": "random-cats-server",
+    "taskRoleArn": "arn:aws:iam::358140414416:role/random-cats-server-task",
+    "executionRoleArn": "arn:aws:iam::358140414416:role/random-cats-ecs-task-execution",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "volumes": [],
+    "placementConstraints": [],
+    "containerDefinitions": [
+        {
+            "name": "server",
+            "image": "358140414416.dkr.ecr.ap-southeast-2.amazonaws.com/random-cats-server:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "S3_BUCKET_NAME",
+                    "value": "random-cats-prod"
+                },
+                {
+                    "name": "S3_PREFIX",
+                    "value": ""
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/random-cats-server",
+                    "awslogs-region": "ap-southeast-2",
+                    "awslogs-stream-prefix": "server"
+                }
+            },
+            "systemControls": []
+        }
+    ]
+}

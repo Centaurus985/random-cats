@@ -12,13 +12,13 @@ env:
   BE_ECR_REPO: random-cats-server
   BE_CONTAINER_NAME: server
   BE_SERVICE: server
-  BE_TASK_DEF: .aws/task-definition-server.json
+  BE_TASK_DEF: terraform/task-definition-server.json
 
   # Frontend config
   FE_ECR_REPO: random-cats-web
   FE_CONTAINER_NAME: web
   FE_SERVICE: web
-  FE_TASK_DEF: .aws/task-definition.json
+  FE_TASK_DEF: terraform/task-definition-web.json
 
 permissions:
   id-token: write # Required for AWS OIDC authentication
@@ -111,3 +111,4 @@ jobs:
           service: ${{ env.FE_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+          
