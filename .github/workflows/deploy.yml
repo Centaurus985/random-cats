@@ -1,0 +1,114 @@
+name: Deploy Full-Stack to Amazon ECS
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: ap-southeast-2                   # Set your AWS region
+  ECS_CLUSTER: random-cats-cluster                 # Set your ECS cluster name
+  
+  # Backend config
+  BE_ECR_REPO: random-cats-server
+  BE_CONTAINER_NAME: server
+  BE_SERVICE: server
+  BE_TASK_DEF: terraform/task-definition-server.json
+
+  # Frontend config
+  FE_ECR_REPO: random-cats-web
+  FE_CONTAINER_NAME: web
+  FE_SERVICE: web
+  FE_TASK_DEF: terraform/task-definition-web.json
+
+permissions:
+  id-token: write # Required for AWS OIDC authentication
+  contents: read
+
+jobs:
+  deploy-backend:
+    name: Build & Deploy Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::358140414416:role/GithubAction
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push backend image to ECR
+        id: build-be
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/${{ env.BE_ECR_REPO }}:$IMAGE_TAG ./server
+          docker push $REGISTRY/${{ env.BE_ECR_REPO }}:$IMAGE_TAG
+          echo "image=$REGISTRY/${{ env.BE_ECR_REPO }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new backend image in the Amazon ECS task definition
+        id: render-be-task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.BE_TASK_DEF }}
+          container-name: ${{ env.BE_CONTAINER_NAME }}
+          image: ${{ steps.build-be.outputs.image }}
+
+      - name: Deploy Amazon ECS backend task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-be-task.outputs.task-definition }}
+          service: ${{ env.BE_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+  deploy-frontend:
+    name: Build & Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: deploy-backend # Optional: Remove 'needs' if you want FE and BE to build/deploy simultaneously in parallel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::358140414416:role/GithubAction
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push frontend image to ECR
+        id: build-fe
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/${{ env.FE_ECR_REPO }}:$IMAGE_TAG .
+          docker push $REGISTRY/${{ env.FE_ECR_REPO }}:$IMAGE_TAG
+          echo "image=$REGISTRY/${{ env.FE_ECR_REPO }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new frontend image in the Amazon ECS task definition
+        id: render-fe-task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.FE_TASK_DEF }}
+          container-name: ${{ env.FE_CONTAINER_NAME }}
+          image: ${{ steps.build-fe.outputs.image }}
+
+      - name: Deploy Amazon ECS frontend task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-fe-task.outputs.task-definition }}
+          service: ${{ env.FE_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          
