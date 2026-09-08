@@ -21,4 +21,4 @@ RUN rm -rf /usr/local/lib/python3.12/site-packages/pip* \
            /usr/local/bin/pip*
 USER app
 EXPOSE 8000
-CMD ["uv", "run", "fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000"]
