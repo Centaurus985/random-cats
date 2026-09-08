@@ -4,14 +4,16 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    UV_PYTHON_DOWNLOADS=0
+
 COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-dev
 COPY . .
 
 FROM python:3.12-slim
 WORKDIR /app
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 \PATH="/app/.venv/bin:$PATH"
 RUN groupadd --system app && useradd --system --gid app --home /app app
 COPY --from=builder /app /app
 RUN chown -R app:app /app
