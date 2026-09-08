@@ -37,9 +37,13 @@ On every pull request targeting `main`, GitHub Actions runs the project's automa
 
 A separate **manually triggered GitHub Actions workflow** builds and deploys the application containers to **Amazon ECR**.
 
+The pipeline interacts with AWS through OIDC and assumes a role to perform the actions it needs to perform, no long lived credentials are used.
+
 ### Container Security
 
 **Trivy** is used to scan the Docker images for known vulnerabilities.
+
+The containers do not run as root and run as a user with non root privileges.
 
 ## CI/CD Overview
 
