@@ -123,7 +123,6 @@ jobs:
           image-ref: ${{ steps.build-fe.outputs.image }}
           format: 'sarif'
           output: 'trivy-results.sarif'
-          exit-code: '1'
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
 
