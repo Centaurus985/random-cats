@@ -15,9 +15,9 @@ The listed infrastructure is provisioned using Terraform automatically in a Gith
 
 There is a Github action set up that runs some tests on pull request to main. 
 
-## TODO
+There is a Github action that deploys the containers to ECR
 
-Add pushing docker images to ECR to Github Actions
+## TODO
 
 Add other checks like security checks to Github Actions
 
