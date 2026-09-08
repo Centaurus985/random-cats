@@ -1,27 +1,55 @@
 # Random Cats
 
-This is a toy project to practice DevOps/Platform engineering principles.
-It displays a random cat picture on page load.
+A small toy project for practising **DevOps and Platform Engineering principles**.
 
-It is a dockerised React/Typescript and Python application using FastAPI as the Python framework. The infrastructure is on AWS and uses the following AWS Services:
-1. Fargate Elastic Container Service is used to run the docker container services.
-2. ECR is used to host the Docker images.
-3. S3 is used to hold the cat pictures
-4. VPC is used for networking.
-5. Load balancer makes sure requests go to where they should.
-6. IAM for permission policies and roles
+Random Cats displays a random cat picture every time the page is loaded. The application is built with **React, TypeScript, and Python/FastAPI**, containerised with Docker, and deployed to **AWS** using infrastructure managed by Terraform.
 
-The listed infrastructure is provisioned using Terraform automatically in a Github Action workflow that is manually triggered. 
+## Architecture
 
-There is a Github action set up that runs some tests on pull request to main. 
+The application is composed of Dockerised frontend and backend services running on AWS.
 
-There is a Github action that deploys the containers to ECR
+The infrastructure uses the following AWS services:
 
-## TODO
+| Service | Purpose |
+|---|---|
+| **Amazon ECS / Fargate** | Runs the containerised application services |
+| **Amazon ECR** | Stores and hosts Docker images |
+| **Amazon S3** | Stores the cat pictures |
+| **Amazon VPC** | Provides networking and network isolation |
+| **Application Load Balancer** | Routes incoming requests to the appropriate services |
+| **AWS IAM** | Manages permissions, policies, and roles |
 
-Add other checks like security checks to Github Actions
+## Infrastructure & Deployment
 
-Add monitoring with Prometheus and Grafana
+Infrastructure is provisioned using **Terraform** and deployed through **GitHub Actions**.
+
+### Terraform
+
+The AWS infrastructure can be provisioned through a **manually triggered GitHub Actions workflow**.
+
+Terraform is also scanned with **Checkov** to identify potential security misconfigurations and infrastructure-as-code issues.
+
+### CI
+
+On every pull request targeting `main`, GitHub Actions runs the project's automated tests.
+
+### Container Deployment
+
+A separate **manually triggered GitHub Actions workflow** builds and deploys the application containers to **Amazon ECR**.
+
+### Container Security
+
+**Trivy** is used to scan the Docker images for known vulnerabilities.
+
+## CI/CD Overview
+
+```text
+Pull Request → GitHub Actions → Tests
+
+Manual Trigger → Terraform → AWS Infrastructure
+
+Manual Trigger → Docker Build → Trivy Scan → ECR
+
 
 
 
